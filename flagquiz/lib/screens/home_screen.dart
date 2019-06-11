@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:flagquiz/screens/game_screen.dart';
+import 'package:flutter/services.dart';
+import 'package:share/share.dart';
 
-class home_screen extends StatelessWidget {
+class home_screen extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return home_state();
+  }
+}
+
+class home_state extends State<home_screen> {
   TextStyle buttonStyle =
       new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 35);
+  TextStyle titleStyle = new TextStyle(fontFamily: "AmaticSC", fontSize: 30);
+  TextStyle subTileStyle = new TextStyle(fontFamily: "AmaticSC", fontSize: 25);
 
-  LinearGradient buttonGradient = new LinearGradient(
-    begin: Alignment.center,
-    end: Alignment(0.8, 0.8),
-    colors: [const Color(0xFF8B0000), const Color(0xFFDC143C)],
-  );
+  static Future<void> pop() async {
+    await SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop');
+  }
 
   var _minPadding = 8.0;
+  Color buttonColor = new Color(0xff8B0000);
+  var _level = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -43,86 +55,169 @@ class home_screen extends StatelessWidget {
 
                   Padding(
                     padding: EdgeInsets.all(_minPadding),
-                    child: Opacity(
-                      opacity: 1.0,
-
-
                     child: RaisedButton(
                         child: Text(
                           "START QUIZ GAME",
                           style: buttonStyle,
                         ),
-                        color: Color(0xff8B0000),
+                        color: buttonColor,
+                        elevation: 10.0,
                         shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(50.0))), //Start Button
-    ),
+                            borderRadius: BorderRadius.circular(50.0)),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => game_screen(_level)));
+                        }), //Start Button
                   ),
-
 
                   Padding(
                     padding: EdgeInsets.all(_minPadding),
                     child: RaisedButton(
                       child: Text(
-                        "LEVEL",
+                        "LEVELS",
                         style: buttonStyle,
                       ),
-                      color: Theme.of(context).primaryColor,
+                      color: buttonColor,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(50.0)),
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => AlertDialog(
+                              title: Text("Levels", style: titleStyle),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Container(
+                                    child: ListView(
+                                        shrinkWrap: true,
+                                        children: <Widget>[
+                                          ListTile(
+                                            title: Text(
+                                              "Easy",
+                                              style: subTileStyle,
+                                            ),
+                                            onTap: () {
+                                              setState(() {
+                                                _level = 1;
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                          ),
+                                          ListTile(
+                                            title: Text(
+                                              "Medium",
+                                              style: subTileStyle,
+                                            ),
+                                            onTap: () {
+                                              setState(() {
+                                                _level = 2;
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                          ),
+                                          ListTile(
+                                            title: Text(
+                                              "Difficult",
+                                              style: subTileStyle,
+                                            ),
+                                            onTap: () {
+                                              setState(() {
+                                                _level = 3;
+                                                Navigator.pop(context);
+                                              });
+                                            },
+                                          ),
+                                        ]) //ListView
+                                    ,
+                                  ), //Container
+                                ],
+                              ) //Column
+                              ),
+                        );
+                      },
                     ), //Level Button
                   ),
 
                   Padding(
                     padding: EdgeInsets.all(_minPadding),
                     child: RaisedButton(
-                      child: Text(
-                        "ABOUT US",
-                        style: buttonStyle,
-                      ),
-                      color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0)),
-                    ), //About Button
+                        child: Text(
+                          "ABOUT US",
+                          style: buttonStyle,
+                        ),
+                        color: buttonColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0)),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                  title: Text("About MobMaxime",
+                                      style: titleStyle),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Text(
+                                        "Mobmaxime is an established Web and Mobile Application Development Company delivering Xamarin, Appcelerator, Native android and iOS applications. www.mobmaxime.com",
+                                        //style: subTileStyle,
+                                        //textAlign: TextAlign.center,
+                                      ),
+                                      RawMaterialButton(
+                                        child: Text("OK", style: titleStyle),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  ))); //showDialog
+                        }), //About Button
                   ),
 
                   Padding(
                     padding: EdgeInsets.all(_minPadding),
                     child: RaisedButton(
-                      child: Text(
-                        "RATE US",
-                        style: buttonStyle,
-                      ),
-                      color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0)),
-                    ), //Rate Button
+                        child: Text(
+                          "RATE US",
+                          style: buttonStyle,
+                        ),
+                        color: buttonColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0)),
+                        onPressed: () {}), //Rate Button
                   ),
 
                   Padding(
                     padding: EdgeInsets.all(_minPadding),
                     child: RaisedButton(
-                      child: Text(
-                        "SHARE",
-                        style: buttonStyle,
-                      ),
-                      color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0)),
-                    ), //Share Button
+                        child: Text(
+                          "SHARE",
+                          style: buttonStyle,
+                        ),
+                        color: buttonColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0)),
+                        onPressed: () {
+                          Share.share(
+                              "Check out the Flags Quiz Game. \nGuess which Country FLIES THE FLAG and check your accuracy!\n https://github.com/MobMaxime/FlagQuiz-Flutter ");
+                        }), //Share Button
                   ),
 
                   Padding(
                     padding: EdgeInsets.all(_minPadding),
                     child: RaisedButton(
-                      child: Text(
-                        "EXIT",
-                        style: buttonStyle,
-                      ),
-                      color: Theme.of(context).primaryColor,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50.0)),
-                    ), //Exit Button
+                        child: Text(
+                          "EXIT",
+                          style: buttonStyle,
+                        ),
+                        color: buttonColor,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0)),
+                        onPressed: () {
+                          SystemNavigator.pop();
+                        }), //Exit Button
                   ),
                 ],
               ),
