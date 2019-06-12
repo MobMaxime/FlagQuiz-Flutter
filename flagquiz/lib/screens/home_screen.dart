@@ -40,7 +40,7 @@ class home_state extends State<home_screen> {
           new Container(
             decoration: BoxDecoration(
                 image: new DecorationImage(
-                    image: new AssetImage("images/background.jpg"))),
+                    image: new AssetImage("assets/images/background.jpg"))),
           ), //Image container
 
           Padding(

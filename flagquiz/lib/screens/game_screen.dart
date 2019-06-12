@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 
 class game_screen extends StatefulWidget {
@@ -15,10 +19,36 @@ class game_state extends State<game_screen> {
   var _minPadding = 1.0;
   var que = 1;
   var options = [];
+  List list;
 
   TextStyle optionStyle =
       new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 20);
   TextStyle titleStyle = new TextStyle(fontFamily: "AmaticSC", fontSize: 30);
+
+  void loadImages() async {
+    var manifestContent =
+        await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
+    Map manifestMap = json.decode(manifestContent);
+
+    var _images = manifestMap.keys.where((key) => key.contains('assets/images/Africa/'));
+
+    list = _images.toList();
+
+
+  }
+
+  List generateRandom(){
+    List nineList; //for 9 random countries
+    int min=1;
+    int max = 53;
+    var random = new Random();
+
+    for(int i=1; i<=(_level*3); i++){
+      int r = min + random.nextInt(max - min);
+      nineList[i-1] = list[r];
+    }
+    return nineList;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +66,7 @@ class game_state extends State<game_screen> {
           new Container(
             decoration: BoxDecoration(
                 image: new DecorationImage(
-                    image: new AssetImage("images/background.jpg"))),
+                    image: new AssetImage("assets/images/background.jpg"))),
           ), //Image container
 
           new Center(
@@ -47,7 +77,24 @@ class game_state extends State<game_screen> {
                   style: titleStyle,
                   //textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 200.0),
+
+
+
+//
+
+                    SizedBox(
+                      height: 150.0,
+                      child:
+    RaisedButton(onPressed: () {
+                     loadImages();
+                    })
+//                      Image(
+//                        image: AssetImage(
+//                            "assets/images/Africa/Africa-Algeria.png"),
+//                      ),
+                    ),
+
+
 
                 Padding(
                   padding: EdgeInsets.all(_minPadding),
@@ -57,26 +104,20 @@ class game_state extends State<game_screen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-
-
-
-
-               Padding(padding: EdgeInsets.all(4.0),
-               child: _level>2 ? getOptions() : null
-              //getOptions(),
-               ),
-
-                Padding(padding: EdgeInsets.all(4.0),
-                  child: _level>1 ? getOptions() : null
-                 //getOptions(),
+                Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: _level > 2 ? getOptions() : null
+                    //getOptions(),
+                    ),
+                Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: _level > 1 ? getOptions() : null
+                    //getOptions(),
+                    ),
+                Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: getOptions(),
                 ),
-
-                Padding(padding: EdgeInsets.all(4.0),
-                  child:
-                  getOptions(),
-                ),
-
-
               ],
             ),
           ),
