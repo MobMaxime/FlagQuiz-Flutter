@@ -21,129 +21,143 @@ class game_state extends State<game_screen> {
   var options = [];
   List totalListFlags;
   List selectionCountry;
-  int correctFlag;
+  List countryNames;
+  String correctFlag;
+  String correctCountry;
+  bool temp = false;
+  bool visible = false;
 
   TextStyle optionStyle =
       new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 20);
   TextStyle titleStyle = new TextStyle(fontFamily: "AmaticSC", fontSize: 30);
+  bool check = false;
+
+  @override
+  void initState() {
+    loadImages();
+  }
 
   void loadImages() async {
     var manifestContent =
         await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
     Map manifestMap = json.decode(manifestContent);
-    var _images = manifestMap.keys.where((key) => key.contains('assets/images/Africa/'));
+    var _images =
+        manifestMap.keys.where((key) => key.contains('assets/images/Africa/'));
     totalListFlags = _images.toList();
     generateRandom();
   }
 
-  List generateRandom(){
+  void generateRandom() async{
     selectionCountry = new List();
     var rng = new Random();
     int min = 0;
-    int max = totalListFlags.length - 1 ;
-    for(int i=1; i<=(_level*3); i++){
+    int max = totalListFlags.length - 1;
+    for (int i = 1; i <= (_level * 3); i++) {
       var a = min + rng.nextInt(max - min);
-      selectionCountry.add(a);
+await      selectionCountry.add(totalListFlags[a]);
     }
-    correctFlag = rng.nextInt((selectionCountry.length - 1) - 0) ;
+    correctFlag =
+        totalListFlags[rng.nextInt((selectionCountry.length - 1) - 0)];
+    correctCountry = correctFlag.substring(
+        correctFlag.indexOf('-') + 1, correctFlag.lastIndexOf('.'));
+await    generateNames();
+    //return selectionCountry;
+  }
 
-    return selectionCountry;
+  void generateNames() async{
+    countryNames = new List();
+    for (int i = 0; i < selectionCountry.length; i++) {
+      await countryNames.add(selectionCountry[i].substring(
+          selectionCountry[i].indexOf('-') + 1,
+          selectionCountry[i].lastIndexOf('.')));
+    }
+    temp = true;
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Flies The Flag",
-            style: TextStyle(
-                color: Colors.white, fontFamily: "AmaticSC", fontSize: 25),
-          ),
-          backgroundColor: Color(0xff8B0000),
-        ), //AppBar
-
-        body: Stack(children: <Widget>[
-          new Container(
-            decoration: BoxDecoration(
-                image: new DecorationImage(
-                    image: new AssetImage("assets/images/background.jpg"))),
-          ), //Image container
-
-          new Center(
-            child: Column(
-              children: <Widget>[
-                Text(
-                  "QUESTION  $que  OF  10",
-                  style: titleStyle,
-                  //textAlign: TextAlign.center,
-                ),
-
-
-
-//
-
-                    SizedBox(
-                      height: 150.0,
-                      child:
-    RaisedButton(onPressed: () {
-                     loadImages();
-                    })
-//                      Image(
-//                        image: AssetImage(
-//                            "assets/images/Africa/Africa-Algeria.png"),
-//                      ),
-                    ),
-
-
-
-                Padding(
-                  padding: EdgeInsets.all(_minPadding),
-                  child: Text(
-                    "GUESS  THE  COUNTRY",
-                    style: titleStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: _level > 2 ? getOptions() : null
-                    //getOptions(),
-                    ),
-                Padding(
-                    padding: EdgeInsets.all(4.0),
-                    child: _level > 1 ? getOptions() : null
-                    //getOptions(),
-                    ),
-                Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: getOptions(),
-                ),
-              ],
+    if(temp) {
+      return new Scaffold(
+          appBar: AppBar(
+            title: Text(
+              "Flies The Flag",
+              style: TextStyle(
+                  color: Colors.white, fontFamily: "AmaticSC", fontSize: 25),
             ),
-          ),
-          Positioned(
-            left: 5.0,
-            right: 5.0,
-            bottom: 5.0,
-            child: Center(
-              child: Text(
-                "(IN)CORRECT",
-                style: titleStyle,
+            backgroundColor: Color(0xff8B0000),
+          ), //AppBar
+
+          body: Stack(children: <Widget>[
+            new Container(
+              decoration: BoxDecoration(
+                  image: new DecorationImage(
+                      image: new AssetImage("assets/images/background.jpg"))),
+            ), //Image container
+
+            new Center(
+              child: Column(
+                children: <Widget>[
+                  Text(
+                    "QUESTION  $que  OF  10",
+                    style: titleStyle,
+                    //textAlign: TextAlign.center,
+                  ),
+                  SizedBox(
+                    height: 150.0,
+                    child: Image(
+                      image: AssetImage(correctFlag),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(_minPadding),
+                    child: Text(
+                      "GUESS  THE  COUNTRY",
+                      style: titleStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  Padding(padding: EdgeInsets.all(4.0), child: getOptions(1)),
+                  Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: _level > 1 ? getOptions(2) : null),
+                  Padding(
+                    padding:  EdgeInsets.all(4.0) ,
+                    child: _level > 2 ? getOptions(3) : null,
+                    //child: null,
+                  ),
+                ],
               ),
             ),
-          )
-        ]) //Stack
-        ); //Scaffold
-  }
-
-  List rows() {
-    for (int i = 1; i <= _level; i++) {
-      options.add(getOptions());
+            Positioned(
+              left: 5.0,
+              right: 5.0,
+              bottom: 5.0,
+              child: Center(
+                child: check ? Text(
+                  "CORRECT",
+                  style: titleStyle,
+                ) : Text(
+                  "INCORRECT",
+                  style: titleStyle,
+                ),
+              ),
+            )
+          ]) //Stack
+      ); //Scaffold
     }
-    return options;
-  }
+    else
+      {return Container();
+  }}
 
-  Row getOptions() {
+//  List rows() {
+//    for (int i = 1; i <= _level; i++) {
+//      options.add(getOptions());
+//    }
+//    return options;
+//  }
+
+  Row getOptions(int r) {
     return Row(
       children: <Widget>[
         Expanded(
@@ -152,10 +166,20 @@ class game_state extends State<game_screen> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             child: Text(
-              "btn",
+              countryNames[r * 1 - 1],
               style: optionStyle,
             ),
-            onPressed: () {},
+            onPressed: () {
+              if(countryNames[r * 1 - 1]==correctCountry) {
+                setState(() {
+                  check = true;
+                });
+              }
+              else
+                setState(() {
+                  check = false;
+                });
+            },
           ),
         ),
         Expanded(
@@ -166,7 +190,7 @@ class game_state extends State<game_screen> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             child: Text(
-              "btn",
+              countryNames[r * 2 - 1],
               style: optionStyle,
             ),
             onPressed: () {},
@@ -178,7 +202,7 @@ class game_state extends State<game_screen> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           child: Text(
-            "btn",
+            countryNames[r * 3 - 1],
             style: optionStyle,
           ),
           onPressed: () {},
