@@ -19,7 +19,9 @@ class game_state extends State<game_screen> {
   var _minPadding = 1.0;
   var que = 1;
   var options = [];
-  List list;
+  List totalListFlags;
+  List selectionCountry;
+  int correctFlag;
 
   TextStyle optionStyle =
       new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 20);
@@ -29,25 +31,23 @@ class game_state extends State<game_screen> {
     var manifestContent =
         await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
     Map manifestMap = json.decode(manifestContent);
-
     var _images = manifestMap.keys.where((key) => key.contains('assets/images/Africa/'));
-
-    list = _images.toList();
-
-
+    totalListFlags = _images.toList();
+    generateRandom();
   }
 
   List generateRandom(){
-    List nineList; //for 9 random countries
-    int min=1;
-    int max = 53;
-    var random = new Random();
-
+    selectionCountry = new List();
+    var rng = new Random();
+    int min = 0;
+    int max = totalListFlags.length - 1 ;
     for(int i=1; i<=(_level*3); i++){
-      int r = min + random.nextInt(max - min);
-      nineList[i-1] = list[r];
+      var a = min + rng.nextInt(max - min);
+      selectionCountry.add(a);
     }
-    return nineList;
+    correctFlag = rng.nextInt((selectionCountry.length - 1) - 0) ;
+
+    return selectionCountry;
   }
 
   @override
