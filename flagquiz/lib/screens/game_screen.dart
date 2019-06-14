@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
-import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flagquiz/Utilities/utils.dart';
 
 class game_screen extends StatefulWidget {
   final int _level;
@@ -14,10 +14,11 @@ class game_screen extends StatefulWidget {
 }
 
 class game_state extends State<game_screen> {
+  Utility utility = new Utility();
   int _level;
   game_state(this._level);
   var _minPadding = 1.0;
-  var que = 1;
+  int que = 0;
   var options = [];
   List totalListFlags;
   List selectionCountry;
@@ -26,14 +27,23 @@ class game_state extends State<game_screen> {
   String correctCountry;
   bool temp = false;
   bool visible = false;
+  int guesses = 0;
+  var accurate;
+  int correct = 0;
+  int incorrect = 0;
+  bool check = false;
+  List continents = ['assets/images/Africa/' , 'assets/images/Asia/', 'assets/images/Europe/', 'assets/images/North_America/', 'assets/images/Oceania/', 'assets/images/South_America/'];
 
   TextStyle optionStyle =
-      new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 17);
+      new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 15);
   TextStyle titleStyle = new TextStyle(fontFamily: "AmaticSC", fontSize: 30);
-  bool check = false;
 
   @override
   void initState() {
+    var rng = new Random();
+    for(int i=0; i<10; i++) {
+      print(rng.nextInt(3));
+    }
     loadImages();
   }
 
@@ -41,43 +51,59 @@ class game_state extends State<game_screen> {
     var manifestContent =
         await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
     Map manifestMap = json.decode(manifestContent);
-    var _images =
-        manifestMap.keys.where((key) => key.contains('assets/images/Africa/'));
-    totalListFlags = _images.toList();
+    for(var name in continents) {
+      var _images =
+      manifestMap.keys.where((key) => key.contains(name));
+      totalListFlags = _images.toList();
+    }
     generateRandom();
   }
 
-  void generateRandom() async{
+  void generateRandom() async {
     selectionCountry = new List();
     var rng = new Random();
     int min = 0;
     int max = totalListFlags.length - 1;
     for (int i = 1; i <= (_level * 3); i++) {
       var a = min + rng.nextInt(max - min);
-await      selectionCountry.add(totalListFlags[a]);
+      await selectionCountry.contains(totalListFlags[a]) ? i-- : selectionCountry.add(totalListFlags[a]);
     }
     correctFlag =
-        totalListFlags[rng.nextInt((selectionCountry.length - 1) - 0)];
-    correctCountry = correctFlag.substring(
-        correctFlag.indexOf('-') + 1, correctFlag.lastIndexOf('.'));
-await    generateNames();
+        selectionCountry[0 + rng.nextInt((selectionCountry.length - 0))];
+    correctCountry = (correctFlag.substring(
+            correctFlag.indexOf('-') + 1, correctFlag.lastIndexOf('.')))
+        .replaceAll('_', ' ');
+    await generateNames();
     //return selectionCountry;
   }
 
-  void generateNames() async{
+  void generateNames() async {
     countryNames = new List();
     for (int i = 0; i < selectionCountry.length; i++) {
-      await countryNames.add(selectionCountry[i].substring(
-          selectionCountry[i].indexOf('-') + 1,
-          selectionCountry[i].lastIndexOf('.')));
+      await countryNames.add((selectionCountry[i].substring(
+              selectionCountry[i].indexOf('-') + 1,
+              selectionCountry[i].lastIndexOf('.')))
+          .replaceAll('_', ' '));
     }
     temp = true;
-    setState(() {});
+
+    que++;
+    if (que > 10) {
+      guesses = correct + incorrect;
+      accurate = ((correct / (guesses)) * 100).toStringAsFixed(2);
+      utility.showAlertDialog(context, "QUIZ OVER",
+          "You made $guesses guesses. \nAccuracy - $accurate %\n\nThank you for Playing :)");
+      return;
+    }
+    setState(() {
+      check = false;
+      visible = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if(temp) {
+    if (temp) {
       return new Scaffold(
           appBar: AppBar(
             title: Text(
@@ -122,7 +148,7 @@ await    generateNames();
                       padding: EdgeInsets.all(4.0),
                       child: _level > 1 ? getOptions(3) : null),
                   Padding(
-                    padding:  EdgeInsets.all(4.0) ,
+                    padding: EdgeInsets.all(4.0),
                     child: _level > 2 ? getOptions(6) : null,
                     //child: null,
                   ),
@@ -133,29 +159,35 @@ await    generateNames();
               left: 5.0,
               right: 5.0,
               bottom: 5.0,
-              child: Center(
-                child: check ? Text(
-                  "CORRECT",
-                  style: titleStyle,
-                ) : Text(
-                  "INCORRECT",
-                  style: titleStyle,
-                ),
-              ),
+              child: visible
+                  ? Center(
+                      child: check
+                          ? Text(
+                              "CORRECT",
+                              style: TextStyle(
+                                  fontFamily: "AmaticSC",
+                                  fontSize: 30,
+                                  color: Colors.green),
+                            )
+                          : Text(
+                              "INCORRECT",
+                              style: TextStyle(
+                                  fontFamily: "AmaticSC",
+                                  fontSize: 30,
+                                  color: Colors.red),
+                            ),
+                    ) //Center
+                  : Container(),
             )
           ]) //Stack
-      ); //Scaffold
-    }
-    else
-      {return Container();
-  }}
+          ); //Scaffold
 
-//  List rows() {
-//    for (int i = 1; i <= _level; i++) {
-//      options.add(getOptions());
-//    }
-//    return options;
-//  }
+    } else {
+      return Container();
+    }
+  }
+
+  Text choseCorrect() {}
 
   Row getOptions(int r) {
     return Row(
@@ -170,15 +202,23 @@ await    generateNames();
               style: optionStyle,
             ),
             onPressed: () {
-//              if(/*condition*/) {
-//                setState(() {
-//                  check = true;
-//                });
-//              }
-//              else
-//                setState(() {
-//                  check = false;
-//                });
+              if (countryNames[r] == correctCountry) {
+                setState(() {
+                  visible = true;
+                  check = true;
+                  correct++;
+                });
+                const oneSec = const Duration(milliseconds: 500);
+                var timer = new Timer.periodic(oneSec, (Timer t) {
+                  generateRandom();
+                  t.cancel();
+                });
+              } else
+                setState(() {
+                  visible = true;
+                  check = false;
+                  incorrect++;
+                });
             },
           ),
         ),
@@ -190,19 +230,28 @@ await    generateNames();
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             child: Text(
-              countryNames[r + 1 ],
+              countryNames[r + 1],
               style: optionStyle,
             ),
             onPressed: () {
-//              if(/*condition*/) {
-//                setState(() {
-//                  check = true;
-//                });
-//              }
-//              else
-//                setState(() {
-//                  check = false;
-//                });
+              if (countryNames[r + 1] == correctCountry) {
+                setState(() {
+                  visible = true;
+                  check = true;
+                  correct++;
+                });
+
+                const oneSec = const Duration(milliseconds: 500);
+                var timer = new Timer.periodic(oneSec, (Timer t) {
+                  generateRandom();
+                  t.cancel();
+                });
+              } else
+                setState(() {
+                  visible = true;
+                  check = false;
+                  incorrect++;
+                });
             },
           ),
         )),
@@ -216,15 +265,23 @@ await    generateNames();
             style: optionStyle,
           ),
           onPressed: () {
-//            if() {
-//              setState(() {
-//                check = true;
-//              });
-//            }
-//            else
-//              setState(() {
-//                check = false;
-//              });
+            if (countryNames[r + 2] == correctCountry) {
+              setState(() {
+                visible = true;
+                check = true;
+                correct++;
+              });
+              const oneSec = const Duration(milliseconds: 500);
+              var timer = new Timer.periodic(oneSec, (Timer t) {
+                generateRandom();
+                t.cancel();
+              });
+            } else
+              setState(() {
+                visible = true;
+                check = false;
+                incorrect++;
+              });
           },
         ))
       ],

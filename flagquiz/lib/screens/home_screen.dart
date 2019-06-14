@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flagquiz/screens/game_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:share/share.dart';
+import 'package:flagquiz/Utilities/utils.dart';
 
 class home_screen extends StatefulWidget {
   @override
@@ -23,6 +24,8 @@ class home_state extends State<home_screen> {
   var _minPadding = 8.0;
   Color buttonColor = new Color(0xff8B0000);
   var _level = 1;
+  String aboutUs = "Mobmaxime is an established Web and Mobile Application Development Company delivering Xamarin, Appcelerator, Native android and iOS applications. www.mobmaxime.com\n";
+  Utility utility = new Utility();
 
   @override
   Widget build(BuildContext context) {
@@ -152,41 +155,8 @@ class home_state extends State<home_screen> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50.0)),
                         onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (_) => AlertDialog(
-                                  title: Text("About MobMaxime",
-                                      style: titleStyle),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Text(
-                                        "Mobmaxime is an established Web and Mobile Application Development Company delivering Xamarin, Appcelerator, Native android and iOS applications. www.mobmaxime.com",
-                                        //style: subTileStyle,
-                                        //textAlign: TextAlign.center,
-                                      ),
-                                      RawMaterialButton(
-                                        child: Text("OK", style: titleStyle),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  ))); //showDialog
+                            utility.showAlertDialog(context, "ABOUT MOBMAXIME", aboutUs);
                         }), //About Button
-                  ),
-
-                  Padding(
-                    padding: EdgeInsets.all(_minPadding),
-                    child: RaisedButton(
-                        child: Text(
-                          "RATE US",
-                          style: buttonStyle,
-                        ),
-                        color: buttonColor,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50.0)),
-                        onPressed: () {}), //Rate Button
                   ),
 
                   Padding(
