@@ -28,7 +28,7 @@ class game_state extends State<game_screen> {
   bool visible = false;
 
   TextStyle optionStyle =
-      new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 20);
+      new TextStyle(color: Colors.white, fontFamily: "AmaticSC", fontSize: 17);
   TextStyle titleStyle = new TextStyle(fontFamily: "AmaticSC", fontSize: 30);
   bool check = false;
 
@@ -117,13 +117,13 @@ await    generateNames();
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  Padding(padding: EdgeInsets.all(4.0), child: getOptions(1)),
+                  Padding(padding: EdgeInsets.all(4.0), child: getOptions(0)),
                   Padding(
                       padding: EdgeInsets.all(4.0),
-                      child: _level > 1 ? getOptions(2) : null),
+                      child: _level > 1 ? getOptions(3) : null),
                   Padding(
                     padding:  EdgeInsets.all(4.0) ,
-                    child: _level > 2 ? getOptions(3) : null,
+                    child: _level > 2 ? getOptions(6) : null,
                     //child: null,
                   ),
                 ],
@@ -166,19 +166,19 @@ await    generateNames();
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             child: Text(
-              countryNames[r * 1 - 1],
+              countryNames[r],
               style: optionStyle,
             ),
             onPressed: () {
-              if(countryNames[r * 1 - 1]==correctCountry) {
-                setState(() {
-                  check = true;
-                });
-              }
-              else
-                setState(() {
-                  check = false;
-                });
+//              if(/*condition*/) {
+//                setState(() {
+//                  check = true;
+//                });
+//              }
+//              else
+//                setState(() {
+//                  check = false;
+//                });
             },
           ),
         ),
@@ -190,10 +190,20 @@ await    generateNames();
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             child: Text(
-              countryNames[r * 2 - 1],
+              countryNames[r + 1 ],
               style: optionStyle,
             ),
-            onPressed: () {},
+            onPressed: () {
+//              if(/*condition*/) {
+//                setState(() {
+//                  check = true;
+//                });
+//              }
+//              else
+//                setState(() {
+//                  check = false;
+//                });
+            },
           ),
         )),
         Expanded(
@@ -202,10 +212,20 @@ await    generateNames();
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           child: Text(
-            countryNames[r * 3 - 1],
+            countryNames[r + 2],
             style: optionStyle,
           ),
-          onPressed: () {},
+          onPressed: () {
+//            if() {
+//              setState(() {
+//                check = true;
+//              });
+//            }
+//            else
+//              setState(() {
+//                check = false;
+//              });
+          },
         ))
       ],
     ); //Row
